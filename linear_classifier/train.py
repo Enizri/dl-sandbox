@@ -9,9 +9,9 @@ from colorama import init, Fore, Style
 
 
 def train_linear_classifier(
-    learning_rate: float = 1e-2,
-    num_epochs: int = 10,
-    batch_size: int = 100,
+    learning_rate: float = 1e-3,
+    num_epochs: int = 50,
+    batch_size: int = 256,
     train_batches: list = [1],
     optimizer: str = "sgd",
     l2reg: float = 0.0,
@@ -53,13 +53,16 @@ def train_linear_classifier(
             else:
                 if l2reg > 0:
                     loss += 0.5 * l2reg * np.sum(model.W * model.W)
-                    grad += l2reg * model.W
                 train_loss_history.append(loss)
 
             # Optimizer update options for sgd, adam, and adamw from bash args
             g = X_batch.T.dot(grad)
+            if optimizer != "adamw" and l2reg > 0:
+                g += l2reg * model.W
+            gb = np.sum(grad, axis=0)  # Gradient for bias
             if optimizer == "sgd":
                 model.W -= lr * g
+                model.b -= lr * gb
             elif optimizer == "adam":
                 t += 1
                 m = beta1 * m + (1 - beta1) * g
@@ -67,6 +70,7 @@ def train_linear_classifier(
                 m_hat = m / (1 - beta1 ** t)
                 v_hat = v / (1 - beta2 ** t)
                 model.W -= lr * m_hat / (np.sqrt(v_hat) + eps)
+                model.b -= lr * gb
             elif optimizer == "adamw":
                 t += 1
                 m = beta1 * m + (1 - beta1) * g
@@ -75,6 +79,7 @@ def train_linear_classifier(
                 v_hat = v / (1 - beta2 ** t)
                 # AdamW: decoupled weight decay
                 model.W -= lr * m_hat / (np.sqrt(v_hat) + eps)
+                model.b -= lr * gb
                 if l2reg > 0:
                     model.W -= lr * l2reg * model.W
             else:
@@ -99,7 +104,7 @@ def train_linear_classifier(
 
 
 if __name__ == "__main__":
-    #reset colorama for colorful terminal output
+    #reset colorama logs
     init(autoreset=True)
     parser = argparse.ArgumentParser(description="Train a linear classifier on CIFAR-10.")
     parser.add_argument('-b', '--train-batches', nargs='+', type=int, default=[1], help='List of training batch numbers (1-5)')
@@ -116,6 +121,8 @@ if __name__ == "__main__":
     )
     # Optionally save loss history for notebook
     np.save("results/train_loss.npy", np.array(loss_history))
+    
     # Save model weights
     np.save("results/model_weights.npy", model.W)
+    np.save("results/model_bias.npy", model.b)
     print(Style.BRIGHT + Fore.CYAN + "Training complete. Model weights saved to results/model_weights.npy" + Style.RESET_ALL)

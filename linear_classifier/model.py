@@ -13,6 +13,7 @@ class LinearClassifier:
             num_classes (int): Number of output classes (C)
         """
         self.W = 0.001 * np.random.randn(input_dim, num_classes)
+        self.b = np.zeros(num_classes)
 
     def forward(self, X: np.ndarray) -> np.ndarray:
         """
@@ -24,7 +25,7 @@ class LinearClassifier:
         Returns:
             np.ndarray: Class scores of shape (N, C)
         """
-        return X.dot(self.W)
+        return X.dot(self.W) + self.b
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """
