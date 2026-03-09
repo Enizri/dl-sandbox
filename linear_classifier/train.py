@@ -39,7 +39,7 @@ def train_linear_classifier(
             lr = learning_rate * 0.5 * (1 + np.cos(np.pi * epoch / num_epochs))
         else:
             lr = learning_rate
-            
+        #train on random batches each epoch  
         perm = np.random.permutation(X_train.shape[0])
         for i in range(0, X_train.shape[0], batch_size):
             X_batch = X_train[perm[i : i + batch_size]]
@@ -99,12 +99,13 @@ def train_linear_classifier(
 
 
 if __name__ == "__main__":
+    #reset colorama for colorful terminal output
     init(autoreset=True)
     parser = argparse.ArgumentParser(description="Train a linear classifier on CIFAR-10.")
-    parser.add_argument('--train-batches', nargs='+', type=int, default=[1], help='List of training batch numbers (1-5)')
-    parser.add_argument('--optimizer', type=str, default='sgd', choices=['sgd', 'adam', 'adamw'], help='Optimizer to use (sgd, adam, or adamw)')
-    parser.add_argument('--lr-schedule', type=str, default=None, choices=[None, 'cosine'], help='Learning rate schedule (None or cosine)')
-    parser.add_argument('--l2reg', type=float, default=0.0, help='L2 regularization strength')
+    parser.add_argument('-b', '--train-batches', nargs='+', type=int, default=[1], help='List of training batch numbers (1-5)')
+    parser.add_argument('-o', '--optimizer', type=str, default='sgd', choices=['sgd', 'adam', 'adamw'], help='Optimizer to use (sgd, adam, or adamw)')
+    parser.add_argument('-l', '--lr-schedule', type=str, default=None, choices=[None, 'cosine'], help='Learning rate schedule (None or cosine)')
+    parser.add_argument('-r', '--l2reg', type=float, default=0.0, help='L2 regularization strength')
     args = parser.parse_args()
 
     model, loss_history = train_linear_classifier(
@@ -115,4 +116,6 @@ if __name__ == "__main__":
     )
     # Optionally save loss history for notebook
     np.save("results/train_loss.npy", np.array(loss_history))
-    print(Style.BRIGHT + Fore.CYAN + "Training complete." + Style.RESET_ALL)
+    # Save model weights
+    np.save("results/model_weights.npy", model.W)
+    print(Style.BRIGHT + Fore.CYAN + "Training complete. Model weights saved to results/model_weights.npy" + Style.RESET_ALL)
