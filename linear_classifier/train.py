@@ -4,6 +4,7 @@ from loss import softmax_loss
 from utils import load_cifar10
 import argparse
 from colorama import init, Fore, Style
+import os
 
 
 
@@ -18,6 +19,10 @@ def train_linear_classifier(
     lr_schedule: str = None,
 ) -> tuple[LinearClassifier, list[float]]:
     
+    # check if results directory exists, if not create it
+    if not os.path.exists("results"):
+        os.makedirs("results")
+        
     """Train linear classifier on CIFAR-10 with optimizer and L2 regularization options."""
     X_train, y_train, X_val, y_val, X_test, Y_test = load_cifar10(train_batches=train_batches)
     input_dim = X_train.shape[1]
@@ -56,30 +61,30 @@ def train_linear_classifier(
                 train_loss_history.append(loss)
 
             # Optimizer update options for sgd, adam, and adamw from bash args
-            g = X_batch.T.dot(grad)
+            dl_dw = X_batch.T.dot(grad)
             if optimizer != "adamw" and l2reg > 0:
-                g += l2reg * model.W
-            gb = np.sum(grad, axis=0)  # Gradient for bias
+                dl_dw += l2reg * model.W
+            dl_db = np.sum(grad, axis=0)  # Gradient for bias
             if optimizer == "sgd":
-                model.W -= lr * g
-                model.b -= lr * gb
+                model.W -= lr * dl_dw
+                model.b -= lr * dl_db
             elif optimizer == "adam":
                 t += 1
-                m = beta1 * m + (1 - beta1) * g
-                v = beta2 * v + (1 - beta2) * (g * g)
+                m = beta1 * m + (1 - beta1) * dl_dw
+                v = beta2 * v + (1 - beta2) * (dl_dw * dl_dw)
                 m_hat = m / (1 - beta1 ** t)
                 v_hat = v / (1 - beta2 ** t)
                 model.W -= lr * m_hat / (np.sqrt(v_hat) + eps)
-                model.b -= lr * gb
+                model.b -= lr * dl_db
             elif optimizer == "adamw":
                 t += 1
-                m = beta1 * m + (1 - beta1) * g
-                v = beta2 * v + (1 - beta2) * (g * g)
+                m = beta1 * m + (1 - beta1) * dl_dw
+                v = beta2 * v + (1 - beta2) * (dl_dw * dl_dw)
                 m_hat = m / (1 - beta1 ** t)
                 v_hat = v / (1 - beta2 ** t)
                 # AdamW: decoupled weight decay
                 model.W -= lr * m_hat / (np.sqrt(v_hat) + eps)
-                model.b -= lr * gb
+                model.b -= lr * dl_db
                 if l2reg > 0:
                     model.W -= lr * l2reg * model.W
             else:
@@ -100,6 +105,9 @@ def train_linear_classifier(
         print(color + f"Epoch {epoch+1}, Loss: {loss:.4f}, Val Acc: {val_acc:.4f}, Test Acc: {test_acc:.4f}" + Style.RESET_ALL)
         prev_loss = loss
 
+    # Save final weights after training
+    np.save("results/model_final.npy", {"weights": model.W, "bias": model.b})
+    
     return model, train_loss_history
 
 
