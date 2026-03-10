@@ -62,12 +62,14 @@ def train_linear_classifier(
 
             # Optimizer update options for sgd, adam, and adamw from bash args
             dl_dw = X_batch.T.dot(grad)
+            dl_db = np.sum(grad, axis=0)  # Gradient for bias
             if optimizer != "adamw" and l2reg > 0:
                 dl_dw += l2reg * model.W
-            dl_db = np.sum(grad, axis=0)  # Gradient for bias
+            
             if optimizer == "sgd":
                 model.W -= lr * dl_dw
                 model.b -= lr * dl_db
+            
             elif optimizer == "adam":
                 t += 1
                 m = beta1 * m + (1 - beta1) * dl_dw
@@ -76,6 +78,7 @@ def train_linear_classifier(
                 v_hat = v / (1 - beta2 ** t)
                 model.W -= lr * m_hat / (np.sqrt(v_hat) + eps)
                 model.b -= lr * dl_db
+            
             elif optimizer == "adamw":
                 t += 1
                 m = beta1 * m + (1 - beta1) * dl_dw
