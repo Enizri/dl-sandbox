@@ -10,3 +10,6 @@ wheels/
 .venv
 NOTES.md
 .python-version
+
+secret
+playerground.ipynb
