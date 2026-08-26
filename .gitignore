@@ -13,3 +13,7 @@ NOTES.md
 
 secret
 playerground.ipynb
+
+# Datasets and generated model artifacts
+datasets/
+*.npy
