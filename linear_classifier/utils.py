@@ -22,7 +22,7 @@ def load_cifar10(
 
     # Set default path to datasets/cifar-10-batches-py/ relative to this file
     if path is None:
-        # Find project root (vizM) and use datasets/cifar-10-batches-py relative to it
+        # Find project root and use datasets/cifar-10-batches-py relative to it
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         path = os.path.join(base_dir, "datasets", "cifar-10-batches-py")
         path = os.path.normpath(path) + os.sep
