@@ -1,7 +1,7 @@
 [project]
-name = "vizm"
+name = "dl-sandbox"
 version = "0.1.0"
-description = "Add your description here"
+description = "Deep learning sandbox: neural nets, autograd, and classifiers built from scratch with NumPy"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
