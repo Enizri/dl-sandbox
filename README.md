@@ -1,7 +1,5 @@
 # dl-sandbox
 
-Self experimenting, building and breaking.
+A bunch of ML/AI algorithms and architectures implemented in Python,PyTorch,C++, CUDA...
 
-- **`primitive-nn/`** — a tiny autograd engine and small neural network library.
-- **`linear_classifier/`** — a linear classifier trained on CIFAR-10.
-- **`cnn-np/`** — a small CNN trained on CIFAR-10.
+Building-Breaking-Testing different behaviors.

@@ -1,0 +1,4 @@
+dataset: Salesforce/wikitext
+config: wikitext-2-raw-v1
+splits: train, validation, test
+url: https://huggingface.co/datasets/Salesforce/wikitext

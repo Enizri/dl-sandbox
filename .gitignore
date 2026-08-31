@@ -17,3 +17,6 @@ playerground.ipynb
 # Datasets and generated model artifacts
 datasets/
 *.npy
+tokenizer/models/
+tokenizer/data/wikitext2/*.txt
+!tokenizer/data/wikitext2/SOURCE.txt
